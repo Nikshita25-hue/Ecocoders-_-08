@@ -62,3 +62,39 @@ void loop() {
 
   delay(15000); // 15 seconds
 }
+
+
+
+
+
+
+import requests
+import time
+
+API_URL = "https://api.thingspeak.com/channels/YOUR_CHANNEL_ID/feeds.json?results=1"
+
+AIR_QUALITY_LIMIT = 700
+
+def fetch_data():
+    response = requests.get(API_URL)
+    data = response.json()
+    feed = data["feeds"][0]
+
+    temperature = float(feed["field1"])
+    humidity = float(feed["field2"])
+    air_quality = int(feed["field3"])
+
+    return temperature, humidity, air_quality
+
+while True:
+    temp, hum, air = fetch_data()
+
+    print(f"Temperature: {temp} °C")
+    print(f"Humidity: {hum} %")
+    print(f"Air Quality Index: {air}")
+
+    if air > AIR_QUALITY_LIMIT:
+        print("⚠ ALERT: Poor Air Quality Detected!")
+
+    print("-" * 40)
+    time.sleep(20)
